@@ -145,3 +145,29 @@ class Pivot:
             f"Pivot(table={tbl}, pivot_column={self.pivot_column!r}, "
             f"value_column={self.value_column!r}, agg={self.agg!r}, values={vals})"
         )
+
+
+@dataclass
+class Unpivot:
+    """AST node representing a Table.Unpivot operation.
+
+    Fields:
+    - table: a table identifier or previous AST node
+    - columns: list of column names to unpivot into attribute/value rows
+    - attribute_column: name of the output attribute column (e.g. 'attribute')
+    - value_column: name of the output value column (e.g. 'value')
+    """
+
+    table: Any
+    columns: List[str]
+    attribute_column: str
+    value_column: str
+
+    def __repr__(self) -> str:
+        tbl = getattr(self.table, "__name__", None) or repr(self.table)
+        cols = ", ".join(self.columns)
+        return (
+            f"Unpivot(table={tbl}, columns=[{cols}], "
+            f"attribute_column={self.attribute_column!r}, "
+            f"value_column={self.value_column!r})"
+        )
