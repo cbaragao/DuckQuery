@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Any
-from typing import List
+from typing import List, Dict
 
 
 @dataclass
@@ -52,3 +52,38 @@ class AddColumn:
     def __repr__(self) -> str:
         tbl = getattr(self.table, "__name__", None) or repr(self.table)
         return f"AddColumn(table={tbl}, new_column={self.new_column!r}, expression={self.expression!r})"
+
+
+@dataclass
+class RenameColumns:
+    """AST node representing a Table.RenameColumns operation.
+
+    Fields:
+    - table: a table identifier or previous AST node
+    - mapping: dict mapping existing column names to new names
+    """
+    table: Any
+    mapping: Dict[str, str]
+
+    def __repr__(self) -> str:
+        tbl = getattr(self.table, "__name__", None) or repr(self.table)
+        return f"RenameColumns(table={tbl}, mapping={self.mapping})"
+
+
+@dataclass
+class Group:
+    """AST node representing a Table.Group operation.
+
+    Fields:
+    - table: a table identifier or previous AST node
+    - keys: list of column names to group by
+    - aggs: dict mapping output column name to aggregation expression (e.g. {'count': 'COUNT(id)'})
+    """
+    table: Any
+    keys: List[str]
+    aggs: Dict[str, str]
+
+    def __repr__(self) -> str:
+        tbl = getattr(self.table, "__name__", None) or repr(self.table)
+        keys = ", ".join(self.keys)
+        return f"Group(table={tbl}, keys=[{keys}], aggs={self.aggs})"
