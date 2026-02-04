@@ -13,10 +13,10 @@ Atomized checklist (implement one function/method + one unit test per item)
 - [x] `ast.nodes.SelectRows`: constructor + simple repr
 - [x] `ast.nodes.SelectColumns`: constructor + simple repr
 - [x] `ast.nodes.AddColumn`: constructor + simple repr
-- [ ] `ast.nodes.RenameColumns`: constructor + simple repr
-- [ ] `ast.nodes.Group`: constructor + simple repr
-- [ ] `ast.nodes.Join`: constructor + simple repr
-- [ ] `ast.nodes.Pivot`: constructor + simple repr
+- [x] `ast.nodes.RenameColumns`: constructor + simple repr
+- [x] `ast.nodes.Group`: constructor + simple repr
+- [x] `ast.nodes.Join`: constructor + simple repr
+- [x] `ast.nodes.Pivot`: constructor + simple repr
 - [ ] `ast.nodes.Unpivot`: constructor + simple repr
 - [ ] `ast.nodes.Buffer`: constructor + simple repr
 - [ ] `ast.explain_step(step)`: returns a short description string
@@ -48,7 +48,7 @@ Atomized checklist (implement one function/method + one unit test per item)
 - [ ] `tests.test_partial_folding_detection()`: unit test for partial folding case
 - [ ] `native.execute_passthrough(sql)`: execute native SQL without further translation
 - [ ] `validate.basic_check(expr)`: return error for unsupported constructs
-- [ ] `ci.workflow.yaml`: workflow function that runs `pytest -q` (create CI config file)
+- [x] `ci.workflow.yaml`: workflow function that runs `pytest -q` (create CI config file)
 - [ ] `docs.cookbook_select_where_join.md`: one-page examples mapping M-like ops to SQL
 
 How to work from this plan
