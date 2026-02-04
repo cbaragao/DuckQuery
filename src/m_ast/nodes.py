@@ -87,3 +87,24 @@ class Group:
         tbl = getattr(self.table, "__name__", None) or repr(self.table)
         keys = ", ".join(self.keys)
         return f"Group(table={tbl}, keys=[{keys}], aggs={self.aggs})"
+
+
+@dataclass
+class Join:
+    """AST node representing a Table.Join operation.
+
+    Fields:
+    - left: left table identifier or previous AST node
+    - right: right table identifier or AST node
+    - on: dict mapping left->right column names for the join condition
+    - kind: join type e.g. 'inner', 'left', 'right', 'full'
+    """
+    left: Any
+    right: Any
+    on: Dict[str, str]
+    kind: str = "inner"
+
+    def __repr__(self) -> str:
+        left = getattr(self.left, "__name__", None) or repr(self.left)
+        right = getattr(self.right, "__name__", None) or repr(self.right)
+        return f"Join(left={left}, right={right}, on={self.on}, kind={self.kind!r})"
