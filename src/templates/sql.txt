@@ -1,0 +1,36 @@
+SELECT
+{%- if select and select|length > 0 %}
+    {{ select | join(', ') }}
+{%- else %}
+    *
+{%- endif %}
+FROM {{ table }}
+{% if joins %}
+{% for join in joins %}
+ {{ join.type | upper }} JOIN {{ join.table }}
+{% if join.using %}
+ USING ({{ join.using | join(', ') }})
+{% elif join.condition %}
+ ON {{ join.condition }}
+{% endif %}
+{%- endfor %}
+{%- endif %}
+{% if where and where|length > 0 %}
+WHERE
+    {{ where | join(' AND\n    ') }}
+{% endif %}
+{% if group_by and group_by|length > 0 %}
+GROUP BY {{ group_by | join(', ') }}
+{% endif %}
+{% if having %}
+HAVING {{ having }}
+{% endif %}
+{% if order_by and order_by|length > 0 %}
+ORDER BY {{ order_by | join(', ') }}
+{% endif %}
+{% if limit is not none %}
+LIMIT {{ limit }}
+{% endif %}
+{% if offset is not none %}
+OFFSET {{ offset }}
+{% endif %}
