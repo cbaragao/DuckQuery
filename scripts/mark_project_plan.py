@@ -17,6 +17,7 @@ the current branch.
 from __future__ import annotations
 
 import argparse
+import re
 import subprocess
 from pathlib import Path
 import sys
@@ -31,7 +32,9 @@ def mark_task(task: str) -> bool:
     changed = False
     for i, line in enumerate(lines):
         if "- [ ]" in line and target in line:
-            lines[i] = line.replace("- [ ]", "- [x]")
+            # Normalize indentation: keep leading whitespace but ensure hyphen
+            # immediately follows indentation and a single space after hyphen.
+            lines[i] = re.sub(r"^(\s*)-\s*\[ \]", r"\1- [x]", line, count=1)
             changed = True
             break
     if not changed:
@@ -40,15 +43,17 @@ def mark_task(task: str) -> bool:
     return True
 
 
-def git_commit_and_push(commit: bool, push: bool) -> None:
+def git_commit_and_push(commit: bool, push: bool, task: str | None = None) -> None:
     if not commit and not push:
         return
     subprocess.run(["git", "add", str(PROJECT_PLAN)], check=True)
     if commit:
-        subprocess.run(
-            ["git", "commit", "-m", f"PROJECT_PLAN: mark {args.task} as completed"],
-            check=True,
+        msg = (
+            f"PROJECT_PLAN: mark {task} as completed"
+            if task
+            else "PROJECT_PLAN: update"
         )
+        subprocess.run(["git", "commit", "-m", msg], check=True)
     if push:
         subprocess.run(["git", "push", "origin", "HEAD"], check=True)
 
