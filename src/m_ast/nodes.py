@@ -11,6 +11,7 @@ class SelectRows:
     - table: a table identifier or previous AST node
     - condition: an M-like condition string (e.g. "age >= 30")
     """
+
     table: Any
     condition: str
 
@@ -27,6 +28,7 @@ class SelectColumns:
     - table: a table identifier or previous AST node
     - columns: list of column names to project
     """
+
     table: Any
     columns: List[str]
 
@@ -45,13 +47,17 @@ class AddColumn:
     - new_column: name of the new column to create
     - expression: an expression string describing how to compute the column
     """
+
     table: Any
     new_column: str
     expression: str
 
     def __repr__(self) -> str:
         tbl = getattr(self.table, "__name__", None) or repr(self.table)
-        return f"AddColumn(table={tbl}, new_column={self.new_column!r}, expression={self.expression!r})"
+        return (
+            f"AddColumn(table={tbl}, new_column={self.new_column!r}, "
+            f"expression={self.expression!r})"
+        )
 
 
 @dataclass
@@ -62,12 +68,15 @@ class RenameColumns:
     - table: a table identifier or previous AST node
     - mapping: dict mapping existing column names to new names
     """
+
     table: Any
     mapping: Dict[str, str]
 
     def __repr__(self) -> str:
         tbl = getattr(self.table, "__name__", None) or repr(self.table)
-        return f"RenameColumns(table={tbl}, mapping={self.mapping})"
+        return (
+            f"RenameColumns(table={tbl}, mapping={self.mapping})"
+        )
 
 
 @dataclass
@@ -77,8 +86,10 @@ class Group:
     Fields:
     - table: a table identifier or previous AST node
     - keys: list of column names to group by
-    - aggs: dict mapping output column name to aggregation expression (e.g. {'count': 'COUNT(id)'})
+        - aggs: dict mapping output column name to aggregation expression.
+            Example: {'count': 'COUNT(id)'}
     """
+
     table: Any
     keys: List[str]
     aggs: Dict[str, str]
@@ -86,7 +97,9 @@ class Group:
     def __repr__(self) -> str:
         tbl = getattr(self.table, "__name__", None) or repr(self.table)
         keys = ", ".join(self.keys)
-        return f"Group(table={tbl}, keys=[{keys}], aggs={self.aggs})"
+        return (
+            f"Group(table={tbl}, keys=[{keys}], aggs={self.aggs})"
+        )
 
 
 @dataclass
@@ -99,6 +112,7 @@ class Join:
     - on: dict mapping left->right column names for the join condition
     - kind: join type e.g. 'inner', 'left', 'right', 'full'
     """
+
     left: Any
     right: Any
     on: Dict[str, str]
@@ -107,7 +121,10 @@ class Join:
     def __repr__(self) -> str:
         left = getattr(self.left, "__name__", None) or repr(self.left)
         right = getattr(self.right, "__name__", None) or repr(self.right)
-        return f"Join(left={left}, right={right}, on={self.on}, kind={self.kind!r})"
+        return (
+            f"Join(left={left}, right={right}, on={self.on}, "
+            f"kind={self.kind!r})"
+        )
 
 
 @dataclass
@@ -121,6 +138,7 @@ class Pivot:
     - agg: aggregation expression (e.g. 'SUM') or string describing aggregation
     - values: optional list of values to pivot into columns
     """
+
     table: Any
     pivot_column: str
     value_column: str
@@ -130,4 +148,7 @@ class Pivot:
     def __repr__(self) -> str:
         tbl = getattr(self.table, "__name__", None) or repr(self.table)
         vals = ", ".join(self.values) if self.values else "None"
-        return f"Pivot(table={tbl}, pivot_column={self.pivot_column!r}, value_column={self.value_column!r}, agg={self.agg!r}, values={vals})"
+        return (
+            f"Pivot(table={tbl}, pivot_column={self.pivot_column!r}, "
+            f"value_column={self.value_column!r}, agg={self.agg!r}, values={vals})"
+        )

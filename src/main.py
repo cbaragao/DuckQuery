@@ -1,4 +1,3 @@
-import seaborn as sns
 import pandas as pd
 import duckdb
 import traceback
@@ -7,13 +6,13 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 from m_ast.nodes import SelectColumns
 from m_ast.emit import emit_selectcolumns
 
-env = Environment(
-    loader=PackageLoader("main"),
-    autoescape=select_autoescape()
-)
+env = Environment(loader=PackageLoader("main"), autoescape=select_autoescape())
+
+
 class Outlier(Enum):
     HIGH = auto()
     LOW = auto()
+
 
 class Jointype(Enum):
     INNER = "INNER"
@@ -32,52 +31,54 @@ class List:
         self.value = value
         # Register the dataframe with DuckDB so it can track changes
         self.registered_tables = {}
-        self.db.register('current_df', self.df)
-    
+        self.db.register("current_df", self.df)
+
     def __enter__(self):
         return self
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
-        if hasattr(self, 'db') and self.db:
+        if hasattr(self, "db") and self.db:
             self.db.close()
             self.db = None
-        
+
         if exc_type is None:
             print("List context exited normally")
         else:
             print(f"Exception occurred: {exc_type.__name__}")
             print(f"Error message: {exc_val}")
-            
+
             if exc_tb:
                 print("Traceback:")
                 traceback.print_tb(exc_tb)
-        
+
         return False
-    
+
     def __del__(self):
-        if hasattr(self, 'db') and self.db:
+        if hasattr(self, "db") and self.db:
             try:
                 self.db.close()
                 self.db = None
-            except:
+            except Exception:
                 pass
-    
+
     def close(self):
-        if hasattr(self, 'db') and self.db:
+        if hasattr(self, "db") and self.db:
             self.db.close()
             self.db = None
-    
-    def register_table(self, name: str, df:pd.DataFrame):
-        '''Register additional dataframes for joins'''
+
+    def register_table(self, name: str, df: pd.DataFrame):
+        """Register additional dataframes for joins"""
         self.db.register(name, df)
         self.registered_tables[name] = df
         return self
 
-    def mean(self, col: str)-> float:
+    def mean(self, col: str) -> float:
         # Use the registered dataframe
-        self.value = self.db.execute(f'SELECT avg("{col}") from current_df').fetchone()[0]
+        self.value = self.db.execute(f'SELECT avg("{col}") from current_df').fetchone()[
+            0
+        ]
         return self
-    
+
     def multiply(self, factor: float):
         self.value *= factor
         return self
@@ -90,7 +91,7 @@ class List:
         self.value = float(self.df[col].quantile(percentile))
         return self
 
-    def outlier(self, col:str, tail:Outlier):
+    def outlier(self, col: str, tail: Outlier):
         # Compute robust IQR-based bounds by default
         q1 = self.quantile(col, 0.25).result()
         q3 = self.quantile(col, 0.75).result()
@@ -117,9 +118,9 @@ class List:
                 self.value = q1 - (1.5 * iqr)
         return self
 
-    def median_of_means(self, group_col: str, mean_col:str):
-        result = f'''
-        WITH base as 
+    def median_of_means(self, group_col: str, mean_col: str):
+        result = f"""
+        WITH base as
         (
             SELECT
             "{group_col}",
@@ -127,74 +128,81 @@ class List:
             FROM current_df
             GROUP BY "{group_col}"
         )
-        SELECT 
+        SELECT
             median(b.value) as "Median of Means"
         FROM base b
-        '''
+        """
         self.value = self.db.execute(result).fetchone()[0]
         return self
 
-    def stdev_s(self, col:str):
-        result = f'''
+    def stdev_s(self, col: str):
+        result = f"""
             SELECT
                 stddev_samp("{col}")
             FROM current_df
-        '''
+        """
         self.value = self.db.execute(result).fetchone()[0]
         return self
 
     def order(self, ordering: list):
-        order_by = ','.join(ordering)
-        self.df = self.db.execute(f'SELECT * FROM current_df ORDER BY {order_by}').df()
+        order_by = ",".join(ordering)
+        self.df = self.db.execute(f"SELECT * FROM current_df ORDER BY {order_by}").df()
         self.register()
         return self
 
     def register(self):
-        self.db.register('current_df', self.df)
+        self.db.register("current_df", self.df)
         return self
 
     def limit(self, limit: int):
-        self.df = self.db.execute(f'SELECT * FROM current_df LIMIT {limit}').df()
+        self.df = self.db.execute(f"SELECT * FROM current_df LIMIT {limit}").df()
         self.register()
         return self
-    
+
     def filter(self, condition: str):
         # Update the registered dataframe and get new result
-        self.df = self.db.execute(f'SELECT * from current_df WHERE {condition}').df()
+        self.df = self.db.execute(f"SELECT * from current_df WHERE {condition}").df()
         self.register()  # Re-register the updated dataframe
         return self
-    
-    def select(self, cols:list):
+
+    def select(self, cols: list):
         # Update the registered dataframe and get new result
-        select_cols = ','.join([f'"{col}"' for col in cols])
-        self.df = self.db.execute(f'SELECT {select_cols} from current_df').df()
+        select_cols = ",".join([f'"{col}"' for col in cols])
+        self.df = self.db.execute(f"SELECT {select_cols} from current_df").df()
         self.register()
-        #self.db.register('current_df', self.df)  # Re-register the updated dataframe
+        # self.db.register('current_df', self.df)  # Re-register the updated dataframe
         return self
-    
+
     def show_info(self):
         """Debug method to show current dataframe info"""
         print(f"Current dataframe shape: {self.df.shape}")
         print(f"Columns: {list(self.df.columns)}")
         return self
 
-    def result(self)->float:
+    def result(self) -> float:
         return self.value
-    
-    def data(self)->pd.DataFrame:
+
+    def data(self) -> pd.DataFrame:
         return self.df
 
-    def run_query(self, select:list = [], where:list = [], group_by:list=[], 
-                  having:int = None, order_by:list=[], limit:int=None, 
-                  offset:int=None, joins:list = [])-> str:
-        
+    def run_query(
+        self,
+        select: list = [],
+        where: list = [],
+        group_by: list = [],
+        having: int = None,
+        order_by: list = [],
+        limit: int = None,
+        offset: int = None,
+        joins: list = [],
+    ) -> str:
+
         processed_joins = []
         for join in joins:
             processed_join = join.copy()
-            if isinstance(join.get('type'), Jointype):
-                processed_join['type'] = join['type'].value
-            processed_joins.append(processed_join
-                                   )
+            if isinstance(join.get("type"), Jointype):
+                processed_join["type"] = join["type"].value
+            processed_joins.append(processed_join)
         # Pre-process select list to avoid ambiguous column references when joins
         # are present. If an unqualified column name exists in any registered
         # joined table, qualify it with `current_df.` to disambiguate.
@@ -211,16 +219,20 @@ class List:
                 continue
             s = sel.strip()
             # Leave already-qualified or expression-like select items alone
-            if '.' in s and not s.lower().startswith('count('):
+            if "." in s and not s.lower().startswith("count("):
                 processed_select.append(s)
                 continue
-            if any(tok in s for tok in [' ', '(', ')', '*', ' as ', ' AS ', '"']):
+            if any(tok in s for tok in [" ", "(", ")", "*", " as ", " AS ", '"']):
                 processed_select.append(s)
                 continue
 
             # Determine which tables contain this column
             current_has = s in list(self.df.columns)
-            tables_with = [tname for tname, tdf in self.registered_tables.items() if s in tdf.columns]
+            tables_with = [
+                tname
+                for tname, tdf in self.registered_tables.items()
+                if s in tdf.columns
+            ]
 
             if tables_with and current_has:
                 # Ambiguous: present in current_df and in one or more joined tables
@@ -236,14 +248,14 @@ class List:
             select = processed_select
         params = {
             "select": select,
-            "table":"current_df",
+            "table": "current_df",
             "where": where,
             "group_by": group_by,
             "having": having,
             "order_by": order_by,
             "limit": limit,
             "offset": offset,
-            "joins": processed_joins
+            "joins": processed_joins,
         }
         template = env.get_template("sql.txt")
         query = template.render(**params)
@@ -253,8 +265,8 @@ class List:
         # so tests that expect duplicated column names will pass.
         cols = list(self.df.columns)
         normalized = []
-        seen = {}
         import re
+
         for c in cols:
             m = re.match(r"^(.*)_(\d+)$", str(c))
             if m:
@@ -270,4 +282,3 @@ class List:
         self.df.columns = normalized
         self.register()
         return self
-
