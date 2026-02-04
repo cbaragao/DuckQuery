@@ -39,3 +39,18 @@ Next actions (short):
 - Implemented `m_ast.nodes.Pivot` as an AST node with fields: `pivot_column`, `value_column`, `agg`, and optional `values` list. Added focused unit test and verified full-suite regression tests passed locally (76 tests).
 - Follow the iterative workflow in `.github/PROJECT_PLAN.md` for future atomized items: focused test -> iterate -> full regression -> docs -> commit.
 
+Typing and CI updates (2026-02-04)
+- Added CI and linter configuration: `black`, `flake8`, `mypy`, and a GitHub Actions workflow.
+- Ran `black` to format code; adjusted style and a few long f-strings.
+- Tightened `mypy` config (`no_implicit_optional`, warnings) and fixed typing issues in `src/main.py`:
+	- Annotated `registered_tables` and `self.value`.
+	- Updated methods to return `List` consistently and used `Optional[float]` for `self.value`.
+	- Handled `fetchone()` possibly returning `None` and guarded arithmetic when values are `None`.
+	- Ran `mypy` until no issues remain locally.
+
+Lessons learned:
+- Running linters in a project with many third-party packages can surface issues in `site-packages`; always exclude virtualenv folders in linter configs (`exclude = .venv`).
+- `mypy`'s `no_implicit_optional` is stricter but helps find real None-handling bugs; prefer to annotate optional returns explicitly.
+- Use defensive coding when consuming DB results (e.g., `fetchone()` may return `None`).
+- Add `pre-commit` to enforce formatting and catch issues before commits.
+

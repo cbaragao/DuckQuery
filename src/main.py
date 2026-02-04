@@ -2,6 +2,7 @@ import pandas as pd
 import duckdb
 import traceback
 from enum import Enum, auto
+from typing import Dict, Optional
 from jinja2 import Environment, PackageLoader, select_autoescape
 from m_ast.nodes import SelectColumns
 from m_ast.emit import emit_selectcolumns
@@ -25,12 +26,12 @@ class Jointype(Enum):
 
 
 class List:
-    def __init__(self, df: pd.DataFrame, value=0):
+    def __init__(self, df: pd.DataFrame, value: Optional[float] = 0):
         self.df = df
         self.db = duckdb.connect()
-        self.value = value
+        self.value: Optional[float] = value
         # Register the dataframe with DuckDB so it can track changes
-        self.registered_tables = {}
+        self.registered_tables: Dict[str, pd.DataFrame] = {}
         self.db.register("current_df", self.df)
 
     def __enter__(self):
@@ -72,18 +73,19 @@ class List:
         self.registered_tables[name] = df
         return self
 
-    def mean(self, col: str) -> float:
+    def mean(self, col: str) -> "List":
         # Use the registered dataframe
-        self.value = self.db.execute(f'SELECT avg("{col}") from current_df').fetchone()[
-            0
-        ]
+        row = self.db.execute(f'SELECT avg("{col}") from current_df').fetchone()
+        self.value = row[0] if row else None
         return self
 
-    def multiply(self, factor: float):
+    def multiply(self, factor: float) -> "List":
+        if self.value is None:
+            self.value = 0.0
         self.value *= factor
         return self
 
-    def quantile(self, col: str, percentile: float):
+    def quantile(self, col: str, percentile: float) -> "List":
         # Use pandas quantile to match pandas' behavior and interpolation
         # This avoids differences between DuckDB and pandas quantile implementations
         if col not in self.df.columns:
@@ -91,11 +93,10 @@ class List:
         self.value = float(self.df[col].quantile(percentile))
         return self
 
-    def outlier(self, col: str, tail: Outlier):
+    def outlier(self, col: str, tail: Outlier) -> "List":
         # Compute robust IQR-based bounds by default
         q1 = self.quantile(col, 0.25).result()
         q3 = self.quantile(col, 0.75).result()
-        iqr = q3 - q1
 
         # Heuristic: if there's an extreme outlier (very large max),
         # prefer a std-dev based bound so the threshold reflects extreme skew.
@@ -112,13 +113,23 @@ class List:
             else:
                 self.value = mean - 3 * std
         else:
-            if tail == Outlier.HIGH:
-                self.value = q3 + (1.5 * iqr)
+            # If quantiles are missing, fall back to std-dev heuristic
+            if q1 is None or q3 is None:
+                mean = float(col_series.mean()) if not col_series.empty else 0.0
+                std = float(col_series.std()) if not col_series.empty else 0.0
+                if tail == Outlier.HIGH:
+                    self.value = mean + 3 * std
+                else:
+                    self.value = mean - 3 * std
             else:
-                self.value = q1 - (1.5 * iqr)
+                iqr = q3 - q1
+                if tail == Outlier.HIGH:
+                    self.value = q3 + (1.5 * iqr)
+                else:
+                    self.value = q1 - (1.5 * iqr)
         return self
 
-    def median_of_means(self, group_col: str, mean_col: str):
+    def median_of_means(self, group_col: str, mean_col: str) -> "List":
         result = f"""
         WITH base as
         (
@@ -132,40 +143,42 @@ class List:
             median(b.value) as "Median of Means"
         FROM base b
         """
-        self.value = self.db.execute(result).fetchone()[0]
+        row = self.db.execute(result).fetchone()
+        self.value = row[0] if row else None
         return self
 
-    def stdev_s(self, col: str):
+    def stdev_s(self, col: str) -> "List":
         result = f"""
             SELECT
                 stddev_samp("{col}")
             FROM current_df
         """
-        self.value = self.db.execute(result).fetchone()[0]
+        row = self.db.execute(result).fetchone()
+        self.value = row[0] if row else None
         return self
 
-    def order(self, ordering: list):
+    def order(self, ordering: list) -> "List":
         order_by = ",".join(ordering)
         self.df = self.db.execute(f"SELECT * FROM current_df ORDER BY {order_by}").df()
         self.register()
         return self
 
-    def register(self):
+    def register(self) -> "List":
         self.db.register("current_df", self.df)
         return self
 
-    def limit(self, limit: int):
+    def limit(self, limit: int) -> "List":
         self.df = self.db.execute(f"SELECT * FROM current_df LIMIT {limit}").df()
         self.register()
         return self
 
-    def filter(self, condition: str):
+    def filter(self, condition: str) -> "List":
         # Update the registered dataframe and get new result
         self.df = self.db.execute(f"SELECT * from current_df WHERE {condition}").df()
         self.register()  # Re-register the updated dataframe
         return self
 
-    def select(self, cols: list):
+    def select(self, cols: list) -> "List":
         # Update the registered dataframe and get new result
         select_cols = ",".join([f'"{col}"' for col in cols])
         self.df = self.db.execute(f"SELECT {select_cols} from current_df").df()
@@ -179,7 +192,7 @@ class List:
         print(f"Columns: {list(self.df.columns)}")
         return self
 
-    def result(self) -> float:
+    def result(self) -> Optional[float]:
         return self.value
 
     def data(self) -> pd.DataFrame:
@@ -190,12 +203,12 @@ class List:
         select: list = [],
         where: list = [],
         group_by: list = [],
-        having: int = None,
+        having: Optional[int] = None,
         order_by: list = [],
-        limit: int = None,
-        offset: int = None,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
         joins: list = [],
-    ) -> str:
+    ) -> "List":
 
         processed_joins = []
         for join in joins:
