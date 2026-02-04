@@ -54,3 +54,10 @@ Lessons learned:
 - Use defensive coding when consuming DB results (e.g., `fetchone()` may return `None`).
 - Add `pre-commit` to enforce formatting and catch issues before commits.
 
+Additional lessons (2026-02-04 updates)
+- When adding small, focused AST nodes (`RenameColumns`, `Group`, `Join`, `Pivot`, `Unpivot`), follow the one-feature/one-test loop: add node, add focused unit test, run focused test, run full suite, then update docs and the project plan. The `scripts/mark_project_plan.py` helper can be used to mark items automatically.
+- Pre-commit `mypy` hooks can fail with "duplicate module" errors unless mypy can resolve the package base; set `MYPYPATH=src` or use `--explicit-package-bases`/`--namespace-packages` and ensure `pass_filenames: false` when invoking package-based checks.
+- Running `pre-commit` in a repo may modify files (e.g., `black`) before commit; handle reformatting in the same workflow (hooks run automatically during `git commit`).
+- Add a small CI job step that runs the project-plan marker after tests succeed on `master` to keep `.github/PROJECT_PLAN.md` in sync automatically.
+- When scripts modify checklist files, preserve existing indentation — use a regex that keeps leading whitespace and only normalizes the hyphen and checkbox to avoid accidental formatting diffs.
+
