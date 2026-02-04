@@ -49,7 +49,12 @@ Atomized checklist (implement one function/method + one unit test per item)
 - [ ] `native.execute_passthrough(sql)`: execute native SQL without further translation
 - [ ] `validate.basic_check(expr)`: return error for unsupported constructs
 - [x] `ci.workflow.yaml`: workflow function that runs `pytest -q` (create CI config file)
-- [ ] `docs.cookbook_select_where_join.md`: one-page examples mapping M-like ops to SQL
+ - [x] `.pre-commit-config.yaml`: pre-commit hooks (black, flake8, mypy) added and validated
+ - [x] `setup.cfg` / `pyproject.toml`: linting and mypy configuration added
+ - [x] `requirements.txt`: updated from development venv with `pip freeze`
+ - [x] `README.md`: pre-commit install instructions added
+ - [x] `mypy`: tightened config and typing fixes applied (e.g., `src/main.py`)
+ - [ ] `docs.cookbook_select_where_join.md`: one-page examples mapping M-like ops to SQL
 
 How to work from this plan
 - Implement one item at a time: function + single unit test.
