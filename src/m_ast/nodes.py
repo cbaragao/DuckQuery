@@ -74,9 +74,7 @@ class RenameColumns:
 
     def __repr__(self) -> str:
         tbl = getattr(self.table, "__name__", None) or repr(self.table)
-        return (
-            f"RenameColumns(table={tbl}, mapping={self.mapping})"
-        )
+        return f"RenameColumns(table={tbl}, mapping={self.mapping})"
 
 
 @dataclass
@@ -97,9 +95,7 @@ class Group:
     def __repr__(self) -> str:
         tbl = getattr(self.table, "__name__", None) or repr(self.table)
         keys = ", ".join(self.keys)
-        return (
-            f"Group(table={tbl}, keys=[{keys}], aggs={self.aggs})"
-        )
+        return f"Group(table={tbl}, keys=[{keys}], aggs={self.aggs})"
 
 
 @dataclass
@@ -121,10 +117,7 @@ class Join:
     def __repr__(self) -> str:
         left = getattr(self.left, "__name__", None) or repr(self.left)
         right = getattr(self.right, "__name__", None) or repr(self.right)
-        return (
-            f"Join(left={left}, right={right}, on={self.on}, "
-            f"kind={self.kind!r})"
-        )
+        return f"Join(left={left}, right={right}, on={self.on}, " f"kind={self.kind!r})"
 
 
 @dataclass
