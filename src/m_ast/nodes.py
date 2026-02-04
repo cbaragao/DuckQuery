@@ -108,3 +108,26 @@ class Join:
         left = getattr(self.left, "__name__", None) or repr(self.left)
         right = getattr(self.right, "__name__", None) or repr(self.right)
         return f"Join(left={left}, right={right}, on={self.on}, kind={self.kind!r})"
+
+
+@dataclass
+class Pivot:
+    """AST node representing a Table.Pivot operation.
+
+    Fields:
+    - table: a table identifier or previous AST node
+    - pivot_column: the column whose values become new columns
+    - value_column: the column providing values for the pivoted columns
+    - agg: aggregation expression (e.g. 'SUM') or string describing aggregation
+    - values: optional list of values to pivot into columns
+    """
+    table: Any
+    pivot_column: str
+    value_column: str
+    agg: str
+    values: List[str] | None = None
+
+    def __repr__(self) -> str:
+        tbl = getattr(self.table, "__name__", None) or repr(self.table)
+        vals = ", ".join(self.values) if self.values else "None"
+        return f"Pivot(table={tbl}, pivot_column={self.pivot_column!r}, value_column={self.value_column!r}, agg={self.agg!r}, values={vals})"

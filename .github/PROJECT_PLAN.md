@@ -56,6 +56,21 @@ How to work from this plan
 - Run the focused test, then the full test suite: `python -m pytest -q`.
 - Update this file and the project's TODOs when items are completed.
 
+Development workflow (iterative single-feature development)
+
+- For each feature from the atomized checklist:
+  1. Add or update the single feature implementation (one small function/class).
+  2. Add one focused unit test that reproduces the desired behavior.
+  3. Run the focused test only: `python -m pytest -q tests/test_<feature>_node.py`.
+	  - If it fails, iterate on the implementation until the focused test passes.
+  4. After the focused test passes, run the full test suite: `python -m pytest -q`.
+	  - If any tests fail, fix regressions and re-run the full suite until all pass.
+  5. When the full suite passes, update `Historical/LESSONS.md` and `docs/API_REFERENCE.md`
+	  with a short entry describing the new feature and any usage notes.
+  6. Commit the changes and push to the remote branch.
+
+Follow this loop for each atomized item to keep changes small and regressions easy to find.
+
 Rationale
 - Atomization keeps changes small, simplifies review, and ensures regressions are easy to find and fix.
 

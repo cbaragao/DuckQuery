@@ -35,3 +35,7 @@ Next actions (short):
 - Update `.github/PROJECT_PLAN.md` to mark completed atomized items and keep the checklist in sync.
 - Continue implementing next atomized items (e.g., `RenameColumns`) with one function + test each.
 
+2026-02-04
+- Implemented `m_ast.nodes.Pivot` as an AST node with fields: `pivot_column`, `value_column`, `agg`, and optional `values` list. Added focused unit test and verified full-suite regression tests passed locally (76 tests).
+- Follow the iterative workflow in `.github/PROJECT_PLAN.md` for future atomized items: focused test -> iterate -> full regression -> docs -> commit.
+

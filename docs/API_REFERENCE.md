@@ -26,11 +26,10 @@ Table verbs
 - `Table.Join(table1, table2, joinKind, condition)` -> Table
   - Perform SQL-style joins (Inner, Left, Right, Full) with an `ON` condition.
 
-- `Table.Pivot(table, attributeColumn, valueColumn, aggregate)` -> Table
   - Pivot attribute/value pairs into columns; supports aggregate functions or "Don't aggregate" flow.
+ `Table.Pivot(table, attributeColumn, valueColumn, aggregate, values=None)` -> Table
 
 - `Table.Unpivot(table, columnsToUnpivot)` -> Table
-  - Convert wide columns into attribute/value pairs (unpivot).
 
 - `Table.Buffer(table)` -> Table
   - Materialize the table (force registration/materialization in DuckDB) for non-foldable steps.
