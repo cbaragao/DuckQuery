@@ -17,7 +17,7 @@ Atomized checklist (implement one function/method + one unit test per item)
 - [x] `ast.nodes.Group`: constructor + simple repr
 - [x] `ast.nodes.Join`: constructor + simple repr
 - [x] `ast.nodes.Pivot`: constructor + simple repr
-- [ ] `ast.nodes.Unpivot`: constructor + simple repr
+- [x] `ast.nodes.Unpivot`: constructor + simple repr
 - [ ] `ast.nodes.Buffer`: constructor + simple repr
 - [ ] `ast.explain_step(step)`: returns a short description string
 - [ ] `sql.emit.select_clause(columns)`: emit SELECT fragment
