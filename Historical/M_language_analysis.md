@@ -1,6 +1,7 @@
 # M Language (Power Query) — Analysis & High-Priority Items for DuckQuery
 
 Summary
+
 - The M language (Power Query / Power BI) is a functional, case-insensitive language designed for data transformation. Key concepts useful for `DuckQuery`:
   - Query Folding: pushing transformations back to the data source as composable steps to execute server-side.
   - Step-based transformations: `let` blocks with named steps composing a pipeline.
@@ -8,6 +9,7 @@ Summary
   - Lazy evaluation and pure functions encourage composability and predictable semantics.
 
 High-priority items to include in DuckQuery
+
 1. Query-Folding-aware planner
    - Aim: translate a chain of M-like transformations into a single DuckDB SQL statement where possible.
    - Start with a subset: filtering (`Table.SelectRows`), projection (`Table.SelectColumns`), joins (`Table.Join`), aggregations (`Table.Group`) and order/limit.
@@ -36,10 +38,12 @@ High-priority items to include in DuckQuery
    - Add debugging hooks to show which steps were folded vs materialized.
 
 Roadmap suggestion (first 90 days)
+
 - Week 1-2: Implement a small AST for M-like steps and mapping for selection/filter/group/join.
 - Week 3: Query folding engine that emits DuckDB SQL for foldable chains and materializes non-foldable steps.
 - Week 4: Add `explain()` and tests for folding behavior with varied inputs.
 
 Notes
+
 - Focus on a pragmatic subset. Full M language coverage is large; begin with commonly-used table primitives and expand.
 - Documentation and examples are crucial: show M-like script and the generated SQL side-by-side.

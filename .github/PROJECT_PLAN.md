@@ -1,12 +1,13 @@
-## DuckQuery — Project Plan (Atomized)
+# DuckQuery — Project Plan (Atomized)
 
 This plan is the canonical, atomized project plan: every task is intentionally tiny (one function/method and a focused unit test).
 
 Core Microsoft Learn references
-- Query folding basics: https://learn.microsoft.com/en-us/power-query/query-folding-basics#query-folding-overview
-- Table functions index (pivot/unpivot/group/others): https://learn.microsoft.com/en-us/powerquery-m/table-functions#column-operations
-- Pivot columns: https://learn.microsoft.com/en-us/power-query/pivot-columns
-- Unpivot columns: https://learn.microsoft.com/en-us/power-query/unpivot-column
+
+- Query folding basics: [Query folding overview](https://learn.microsoft.com/en-us/power-query/query-folding-basics#query-folding-overview)
+- Table functions index (pivot/unpivot/group/others): [Table functions](https://learn.microsoft.com/en-us/powerquery-m/table-functions#column-operations)
+- Pivot columns: [Pivot columns](https://learn.microsoft.com/en-us/power-query/pivot-columns)
+- Unpivot columns: [Unpivot columns](https://learn.microsoft.com/en-us/power-query/unpivot-column)
 
 Atomized checklist (implement one function/method + one unit test per item)
 
@@ -56,38 +57,40 @@ Atomized checklist (implement one function/method + one unit test per item)
 - [x] `README.md`: pre-commit install instructions added
 - [x] `mypy`: tightened config and typing fixes applied (e.g., `src/main.py`)
 - [ ] `docs.cookbook_select_where_join.md`: one-page examples mapping M-like ops to SQL
- - [ ] `lint.markdown`: add markdown linter (e.g., `remark-lint` / `markdownlint`) and fix repo warnings
+- [ ] `lint.markdown`: add markdown linter (e.g., `remark-lint` / `markdownlint`) and fix repo warnings
 
 How to work from this plan
+
 - Implement one item at a time: function + single unit test.
 - Run the focused test, then the full test suite: `python -m pytest -q`.
 - Update this file and the project's TODOs when items are completed.
 
 Development workflow (iterative single-feature development)
 
-- For each feature from the atomized checklist:
-  1. Add or update the single feature implementation (one small function/class).
-  2. Add one focused unit test that reproduces the desired behavior.
-  3. Run the focused test only: `python -m pytest -q tests/test_<feature>_node.py`.
-	  - If it fails, iterate on the implementation until the focused test passes.
-  4. After the focused test passes, run the full test suite: `python -m pytest -q`.
-	  - If any tests fail, fix regressions and re-run the full suite until all pass.
-    5. When the full suite passes, update `Historical/LESSONS.md` and `docs/API_REFERENCE.md`
-      with a short entry describing the new feature and any usage notes. Optionally use
-      `scripts/mark_project_plan.py --task "<module.item>" --commit --push` to automatically
-      mark the corresponding item in `.github/PROJECT_PLAN.md` as completed and commit the
-      change. Example:
+For each feature from the atomized checklist:
 
-        python -m scripts.mark_project_plan --task "ast.nodes.Unpivot" --commit --push
+1. Add or update the single feature implementation (one small function/class).
+2. Add one focused unit test that reproduces the desired behavior.
+3. Run the focused test only: `python -m pytest -q tests/test_<feature>_node.py`. If it fails, iterate on the implementation until the focused test passes.
+4. After the focused test passes, run the full test suite: `python -m pytest -q`. If any tests fail, fix regressions and re-run the full suite until all pass.
+5. When the full suite passes, update `Historical/LESSONS.md` and `docs/API_REFERENCE.md`
+   with a short entry describing the new feature and any usage notes. Optionally use
+   `scripts/mark_project_plan.py --task "<module.item>" --commit --push` to automatically
+   mark the corresponding item in `.github/PROJECT_PLAN.md` as completed and commit the
+   change. Example:
 
-    6. Commit the changes and push to the remote branch (or let the script handle commit/push).
+      python -m scripts.mark_project_plan --task "ast.nodes.Unpivot" --commit --push
+
+6. Commit the changes and push to the remote branch (or let the script handle commit/push).
 
 Follow this loop for each atomized item to keep changes small and regressions easy to find.
 
 Rationale
+
 - Atomization keeps changes small, simplifies review, and ensures regressions are easy to find and fix.
 
 Verb Naming Convention
+
 - Canonical API names follow M-style PascalCase with a module prefix, for example `Table.SelectRows`, `Table.AddColumn`, and `Table.Pivot`.
 - No ergonomic aliases: the project will expose only canonical M verb names. Do not provide dplyr/R-style snake_case aliases; this keeps the API faithful to M and avoids synonym confusion.
 - Modules: group verbs by module (e.g. `Table.*`, `Value.*`, `Query.*`).
@@ -95,6 +98,7 @@ Verb Naming Convention
 - Case & style: PascalCase for all public API names. Choose one canonical name per operation and avoid synonyms.
 
 Example canonical names
+
 - `Table.SelectRows`
 - `Table.SelectColumns`
 - `Table.AddColumn`
