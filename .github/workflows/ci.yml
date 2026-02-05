@@ -24,11 +24,24 @@ jobs:
           pip install -r requirements.txt
           pip install black flake8 mypy
 
+      - name: Set up Node.js for markdown lint
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install markdownlint-cli2
+        run: |
+          npm install -g markdownlint-cli2
+
       - name: Lint: black
         run: black --check .
 
       - name: Lint: flake8
         run: flake8 .
+
+      - name: Lint: markdown
+        run: |
+          npx markdownlint-cli2 "**/*.md"
 
       - name: Typecheck: mypy
         continue-on-error: true
