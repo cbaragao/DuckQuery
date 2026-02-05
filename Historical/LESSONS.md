@@ -75,3 +75,4 @@ Additional lessons (2026-02-04 updates)
 
 - Fixed a broken inline checklist token in `.github/PROJECT_PLAN.md` (preserved backticks and avoided splitting inline code across lines).
 - Lessons: avoid breaking inline code or fenced tokens across lines; run `markdownlint` early; add `.markdownlintignore` to skip virtualenv/vendor files; prefer spaces over hard tabs in markdown; preserve indentation when auto-editing checklists.
+- Implemented `m_ast.nodes.Buffer` AST node with focused unit tests. Buffer forces table materialization, preventing further query folding (matches M's `Table.Buffer` semantics). Full test suite: 83 passed.

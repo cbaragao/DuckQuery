@@ -171,3 +171,22 @@ class Unpivot:
             f"attribute_column={self.attribute_column!r}, "
             f"value_column={self.value_column!r})"
         )
+
+
+@dataclass
+class Buffer:
+    """AST node representing a Table.Buffer operation.
+
+    Fields:
+    - table: a table identifier or previous AST node
+
+    Buffer forces materialization of the table into DuckDB,
+    preventing further query folding for upstream operations.
+    This matches M's Table.Buffer semantics.
+    """
+
+    table: Any
+
+    def __repr__(self) -> str:
+        tbl = getattr(self.table, "__name__", None) or repr(self.table)
+        return f"Buffer(table={tbl})"
