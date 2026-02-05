@@ -29,3 +29,14 @@ def select_clause(columns: list[str]) -> str:
         return "SELECT *"
     cols = ", ".join([f'"{c}"' for c in columns])
     return f"SELECT {cols}"
+
+
+def from_clause(table_name: str) -> str:
+    """Emit a SQL FROM fragment for a table name.
+
+    The table name will be double-quoted. If `table_name` is empty or falsy,
+    raises a ValueError.
+    """
+    if not table_name:
+        raise ValueError("table_name must be a non-empty string")
+    return f'FROM "{table_name}"'
