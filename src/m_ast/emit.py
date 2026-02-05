@@ -17,3 +17,15 @@ def emit_selectcolumns(node: SelectColumns) -> str:
         else getattr(node.table, "__name__", repr(node.table))
     )
     return f"SELECT {cols} FROM {table}"
+
+
+def select_clause(columns: list[str]) -> str:
+    """Emit a SQL SELECT fragment for a list of column names.
+
+    - If `columns` is empty, returns `SELECT *`.
+    - Column names are double-quoted for safety.
+    """
+    if not columns:
+        return "SELECT *"
+    cols = ", ".join([f'"{c}"' for c in columns])
+    return f"SELECT {cols}"
