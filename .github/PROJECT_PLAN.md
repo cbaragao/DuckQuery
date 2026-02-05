@@ -21,6 +21,7 @@ Atomized checklist (implement one function/method + one unit test per item)
 - [ ] `ast.nodes.Buffer`: constructor + simple repr
 - [ ] `ast.explain_step(step)`: returns a short description string
 - [ ] `sql.emit.select_clause(columns)`: emit SELECT fragment
+- [x] `sql.emit.select_clause(columns)`: emit SELECT fragment
 - [ ] `sql.emit.from_clause(table_name)`: emit FROM fragment
 - [ ] `sql.emit.where_clause(conditions)`: emit WHERE fragment for simple conditions
 - [ ] `sql.emit.join_clause(join)`: emit SQL for a single JOIN
@@ -55,6 +56,7 @@ Atomized checklist (implement one function/method + one unit test per item)
 - [x] `README.md`: pre-commit install instructions added
 - [x] `mypy`: tightened config and typing fixes applied (e.g., `src/main.py`)
 - [ ] `docs.cookbook_select_where_join.md`: one-page examples mapping M-like ops to SQL
+ - [ ] `lint.markdown`: add markdown linter (e.g., `remark-lint` / `markdownlint`) and fix repo warnings
 
 How to work from this plan
 - Implement one item at a time: function + single unit test.
