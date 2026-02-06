@@ -1,4 +1,4 @@
-from .nodes import SelectColumns
+from .nodes import SelectColumns, Join
 
 
 def emit_selectcolumns(node: SelectColumns) -> str:
@@ -53,3 +53,38 @@ def where_clause(conditions: list[str]) -> str:
         return ""
     joined = " AND ".join(conditions)
     return f"WHERE {joined}"
+
+
+def join_clause(join: Join) -> str:
+    """Emit a SQL JOIN clause for a Join AST node.
+
+    - Supports join kinds: 'inner', 'left', 'right', 'full'
+    - The `on` dict maps left column names to right column names
+    - Table names are extracted from the node or quoted if strings
+    """
+    if not isinstance(join, Join):
+        raise TypeError("join_clause expects a Join node")
+
+    # Extract table names
+    right_table = (
+        join.right
+        if isinstance(join.right, str)
+        else getattr(join.right, "__name__", repr(join.right))
+    )
+
+    # Build ON conditions
+    on_parts = [
+        f'"{left_col}" = "{right_col}"' for left_col, right_col in join.on.items()
+    ]
+    on_clause = " AND ".join(on_parts)
+
+    # Map join kind to SQL syntax
+    kind_map = {
+        "inner": "INNER JOIN",
+        "left": "LEFT JOIN",
+        "right": "RIGHT JOIN",
+        "full": "FULL OUTER JOIN",
+    }
+    join_type = kind_map.get(join.kind, "INNER JOIN")
+
+    return f'{join_type} "{right_table}" ON {on_clause}'
