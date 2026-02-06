@@ -1,65 +1,150 @@
-# DuckQuery — API Reference (Canonical M verbs)
+# DuckQuery — API Reference
 
-This stub lists canonical, M-style public API verbs (PascalCase) that DuckQuery will expose. Each function follows the `Module.Verb` pattern and returns a `Table` unless otherwise noted.
+This document describes the canonical M-style API and the implemented SQL emit functions in DuckQuery.
 
-Core modules
+## AST Nodes (m_ast.nodes)
 
-- `Table` — table-level transforms
-- `Value` — scalar/list operations
-- `Query` — higher-level query composition / execution helpers
+AST nodes represent M-like transformation operations. All nodes are dataclasses with `__repr__` methods.
 
-Table verbs
+### Implemented Nodes
 
-- `Table.SelectRows(table, condition)` -> Table
-  - Filter rows by a boolean `condition` expression. Mirrors `Table.SelectRows` in Power Query.
+- `SelectRows(table, condition)` — Filter rows by a boolean condition expression
+- `SelectColumns(table, columns)` — Project a subset of columns
+- `AddColumn(table, new_column, expression)` — Add a computed column
+- `RenameColumns(table, rename_map)` — Rename columns using a mapping dict
+- `Group(table, keys, aggs)` — Group by key columns with aggregates
+- `Join(left, right, on, kind)` — Join tables (supports inner/left/right/full)
+- `Pivot(table, pivot_column, value_column, agg, values)` — Pivot attribute/value pairs
+- `Unpivot(table, columns, attribute_col, value_col)` — Unpivot columns to rows
+- `Buffer(table)` — Force table materialization (prevents further query folding)
 
-- `Table.SelectColumns(table, columns)` -> Table
-  - Project a subset of columns or reorder.
+## AST Utilities (m_ast)
 
-- `Table.AddColumn(table, newColumnName, expression)` -> Table
-  - Add a computed column using an expression based on existing columns.
+### explain_step(step)
 
-- `Table.RenameColumns(table, mapping)` -> Table
-  - Rename columns using a mapping list of (oldName, newName).
+Returns a human-readable description string for an AST transformation step.
 
-- `Table.Group(table, keyColumns, aggregates)` -> Table
-  - Group by key columns and compute aggregates (COUNT, SUM, AVG, etc.).
+```python
+from m_ast import explain_step, SelectRows
 
-- `Table.Join(table1, table2, joinKind, condition)` -> Table
-  - Perform SQL-style joins (Inner, Left, Right, Full) with an `ON` condition.
+step = SelectRows(table="users", condition="age >= 30")
+print(explain_step(step))
+# Output: "SelectRows: filter by age >= 30"
+```
 
-- `Table.Pivot(table, attributeColumn, valueColumn, aggregate, values=None)` -> Table
-  - Pivot attribute/value pairs into columns; supports aggregate functions or a "Don't aggregate" flow.
+## SQL Emit Functions (m_ast.emit)
 
-- `Table.Unpivot(table, columnsToUnpivot)` -> Table
+Low-level SQL fragment generators for building queries.
 
-- `Table.Buffer(table)` -> Table
-  - Materialize the table (force registration/materialization in DuckDB) for non-foldable steps.
+### select_clause(columns)
 
-Query & utility verbs
+Emit a SQL SELECT fragment for a list of column names.
 
-- `Query.Run(ast_or_sql)` -> Table
-  - Execute a composed AST or raw SQL against DuckDB and return a DataFrame.
+- Returns `SELECT *` if columns list is empty
+- Column names are double-quoted
 
-- `Query.Explain(ast_or_sql)` -> str
-  - Return generated SQL and folding decisions for debugging.
+```python
+from m_ast.emit import select_clause
 
-Identifier & validation helpers
+select_clause(["name", "age"])  # Returns: 'SELECT "name", "age"'
+select_clause([])  # Returns: 'SELECT *'
+```
 
-- `Ident.Quote(name)` -> str
-  - Safely quote identifier names for SQL emission.
+### from_clause(table_name)
 
-- `Validate.Basic(expr)` -> None | raises
-  - Validate M-like expressions for SQL-foldability; raise on unsupported constructs.
+Emit a SQL FROM fragment for a table name.
 
-Notes & links
+- Table name is double-quoted
+- Raises ValueError if table_name is empty
 
-- This API is canonical and M-first. No aliases or dplyr-style names are provided.
-- Refer to Power Query docs for semantics and edge-cases:
-  - Query folding: [Query folding overview](https://learn.microsoft.com/en-us/power-query/query-folding-basics)
-  - Table functions: [Table functions](https://learn.microsoft.com/en-us/powerquery-m/table-functions)
-  - Pivot/Unpivot: [Pivot columns](https://learn.microsoft.com/en-us/power-query/pivot-columns) and [Unpivot columns](https://learn.microsoft.com/en-us/power-query/unpivot-column)
+```python
+from m_ast.emit import from_clause
 
-Next steps
+from_clause("users")  # Returns: 'FROM "users"'
+```
 
-- Fill in function signatures in code, implement one function at a time (see `.github/PROJECT_PLAN.md` atomized checklist), and add unit tests that compare to pandas where applicable.
+### where_clause(conditions)
+
+Emit a SQL WHERE fragment for simple conditions.
+
+- Returns empty string if conditions list is empty
+- Conditions are joined with AND
+
+```python
+from m_ast.emit import where_clause
+
+where_clause(['"age" >= 30', '"city" = \'NYC\''])
+# Returns: 'WHERE "age" >= 30 AND "city" = \'NYC\''
+```
+
+### join_clause(join)
+
+Emit a SQL JOIN clause for a Join AST node.
+
+- Supports join kinds: inner, left, right, full
+- ON conditions are built from the join.on dict mapping
+
+```python
+from m_ast.emit import join_clause
+from m_ast.nodes import Join
+
+join = Join(left="users", right="orders", on={"id": "user_id"}, kind="inner")
+join_clause(join)  # Returns: 'INNER JOIN "orders" ON "id" = "user_id"'
+```
+
+### group_by_clause(columns)
+
+Emit a SQL GROUP BY fragment for column names.
+
+- Returns empty string if columns list is empty
+- Column names are double-quoted
+
+```python
+from m_ast.emit import group_by_clause
+
+group_by_clause(["region", "category"])
+# Returns: 'GROUP BY "region", "category"'
+```
+
+### aggregate_fn(name, arg)
+
+Map aggregate function names to SQL syntax.
+
+- Supports: SUM, COUNT, AVG, MIN, MAX
+- Case-insensitive
+- Handles COUNT(*) as special case (no quoting)
+- Raises ValueError for unsupported functions
+
+```python
+from m_ast.emit import aggregate_fn
+
+aggregate_fn("SUM", "amount")  # Returns: 'SUM("amount")'
+aggregate_fn("COUNT", "*")     # Returns: 'COUNT(*)'
+aggregate_fn("avg", "price")   # Returns: 'AVG("price")'
+```
+
+### order_by_clause(orderings)
+
+Emit a SQL ORDER BY fragment for column/direction pairs.
+
+- Each ordering is a tuple of (column_name, direction)
+- Direction must be ASC or DESC (case-insensitive)
+- Returns empty string if orderings list is empty
+- Raises ValueError for invalid directions
+
+```python
+from m_ast.emit import order_by_clause
+
+order_by_clause([("name", "ASC"), ("age", "DESC")])
+# Returns: 'ORDER BY "name" ASC, "age" DESC'
+```
+
+## Development Status
+
+See [PROJECT_PLAN.md](../.github/PROJECT_PLAN.md) for the atomized task checklist and implementation status.
+
+## References
+
+- Query folding basics: [Query folding overview](https://learn.microsoft.com/en-us/power-query/query-folding-basics)
+- Table functions: [Table functions](https://learn.microsoft.com/en-us/powerquery-m/table-functions)
+- Pivot/Unpivot: [Pivot columns](https://learn.microsoft.com/en-us/power-query/pivot-columns) and [Unpivot columns](https://learn.microsoft.com/en-us/power-query/unpivot-column)
