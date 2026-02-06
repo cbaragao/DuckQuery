@@ -23,7 +23,7 @@ Atomized checklist (implement one function/method + one unit test per item)
 - [x] `ast.explain_step(step)`: returns a short description string
 - [x] `sql.emit.select_clause(columns)`: emit SELECT fragment
 - [x] `sql.emit.from_clause(table_name)`: emit FROM fragment
-- [ ] `sql.emit.where_clause(conditions)`: emit WHERE fragment for simple conditions
+- [x] `sql.emit.where_clause(conditions)`: emit WHERE fragment for simple conditions
 - [ ] `sql.emit.join_clause(join)`: emit SQL for a single JOIN
 - [ ] `sql.emit.group_by_clause(columns)`: emit GROUP BY fragment
 - [ ] `sql.emit.aggregate_fn(name, arg)`: map SUM/COUNT/AVG to SQL

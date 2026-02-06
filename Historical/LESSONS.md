@@ -79,3 +79,4 @@ Additional lessons (2026-02-04 updates)
 - Implemented `ast.explain_step(step)` to return human-readable descriptions of AST transformation steps. Added 9 focused unit tests covering all node types. Full test suite: 92 passed.
 - Fixed pre-commit config warnings: removed deprecated `env:` key from mypy hook (replaced with `additional_dependencies: []`) and removed deprecated `stages: [commit]` from markdownlint hook.
 - Verified `sql.emit.from_clause(table_name)` implementation (already existed with 2 focused unit tests). Function emits FROM clause with quoted table names. Full test suite: 92 passed.
+- Implemented `sql.emit.where_clause(conditions)` to emit WHERE fragment for simple conditions. Added 3 focused unit tests (single condition, multiple conditions AND-joined, empty list). Full test suite: 95 passed.

@@ -40,3 +40,16 @@ def from_clause(table_name: str) -> str:
     if not table_name:
         raise ValueError("table_name must be a non-empty string")
     return f'FROM "{table_name}"'
+
+
+def where_clause(conditions: list[str]) -> str:
+    """Emit a SQL WHERE fragment for simple conditions.
+
+    - If `conditions` is empty, returns an empty string.
+    - Conditions are joined with AND.
+    - Each condition is assumed to be a valid SQL expression.
+    """
+    if not conditions:
+        return ""
+    joined = " AND ".join(conditions)
+    return f"WHERE {joined}"
