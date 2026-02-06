@@ -86,3 +86,4 @@ Additional lessons (2026-02-04 updates)
 - Implemented `sql.emit.order_by_clause(orderings)` to emit ORDER BY fragment for column/direction pairs. Validates direction (ASC/DESC) and is case-insensitive. Added 6 focused unit tests. Full test suite: 116 passed.
 - Implemented `sql.emit.limit_offset(limit, offset)` to emit LIMIT/OFFSET fragments. Handles None, zero, and negative values correctly. Added 8 focused unit tests. Full test suite: 124 passed.
 - Implemented `sql.emit.pivot_basic(params)` to generate basic pivot SQL using CASE expressions. Takes table, pivot column, value column, aggregate function, and list of values. Added 4 focused unit tests. Full test suite: 128 passed.
+- Implemented `sql.emit.unpivot_basic(params)` to generate basic unpivot SQL using UNION ALL. Takes table, list of columns to unpivot, attribute column name, and value column name. Added 4 focused unit tests. Full test suite: 132 passed.

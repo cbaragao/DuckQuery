@@ -198,3 +198,33 @@ def pivot_basic(
 
     select_list = ", ".join(case_exprs)
     return f'SELECT {select_list} FROM "{table_name}"'
+
+
+def unpivot_basic(
+    table_name: str,
+    columns: list[str],
+    attribute_column: str,
+    value_column: str,
+) -> str:
+    """Generate basic unpivot SQL using UNION ALL.
+
+    - table_name: source table
+    - columns: list of column names to unpivot into rows
+    - attribute_column: name of the output attribute column (e.g., 'attribute')
+    - value_column: name of the output value column (e.g., 'value')
+
+    Returns a SQL query string that unpivots the columns.
+    """
+    if not columns:
+        raise ValueError("unpivot_basic requires a non-empty 'columns' list")
+
+    # Build UNION ALL queries for each column
+    union_queries = []
+    for col in columns:
+        query = (
+            f"SELECT '{col}' AS \"{attribute_column}\", "
+            f'"{col}" AS "{value_column}" FROM "{table_name}"'
+        )
+        union_queries.append(query)
+
+    return " UNION ALL ".join(union_queries)
