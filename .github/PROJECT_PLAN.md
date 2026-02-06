@@ -31,7 +31,7 @@ Atomized checklist (implement one function/method + one unit test per item)
 - [x] `sql.emit.limit_offset(limit, offset)`: emit LIMIT/OFFSET fragments (handle 0)
 - [x] `sql.emit.pivot_basic(params)`: generate basic pivot SQL
 - [x] `sql.emit.unpivot_basic(params)`: generate basic unpivot SQL
-- [ ] `ident.quote(name)`: safely quote an identifier
+- [x] `ident.quote(name)`: safely quote an identifier
 - [ ] `ident.is_reserved(name)`: detect common reserved words
 - [ ] `cols.normalize_suffixes(columns)`: strip `_1`, `_2` suffixes when safe
 - [ ] `tests.test_normalize_single_suffix()`: unit test for suffix stripper

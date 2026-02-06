@@ -88,3 +88,4 @@ Additional lessons (2026-02-04 updates)
 - Implemented `sql.emit.pivot_basic(params)` to generate basic pivot SQL using CASE expressions. Takes table, pivot column, value column, aggregate function, and list of values. Added 4 focused unit tests. Full test suite: 128 passed.
 - Implemented `sql.emit.unpivot_basic(params)` to generate basic unpivot SQL using UNION ALL. Takes table, list of columns to unpivot, attribute column name, and value column name. Added 4 focused unit tests. Full test suite: 132 passed.
 - Pre-commit workflow: To avoid black reformatting failures on commit, run `black src/ tests/` BEFORE `git add -A` to format files first, then stage and commit. This prevents the pre-commit hook from modifying already-staged files.
+- Implemented `ident.quote(name)` to safely quote SQL identifiers. Escapes embedded double quotes by doubling them. Added 7 focused unit tests. Full test suite: 139 passed.
