@@ -27,7 +27,7 @@ Atomized checklist (implement one function/method + one unit test per item)
 - [x] `sql.emit.join_clause(join)`: emit SQL for a single JOIN
 - [x] `sql.emit.group_by_clause(columns)`: emit GROUP BY fragment
 - [x] `sql.emit.aggregate_fn(name, arg)`: map SUM/COUNT/AVG to SQL
-- [ ] `sql.emit.order_by_clause(orderings)`: emit ORDER BY fragment
+- [x] `sql.emit.order_by_clause(orderings)`: emit ORDER BY fragment
 - [ ] `sql.emit.limit_offset(limit, offset)`: emit LIMIT/OFFSET fragments (handle 0)
 - [ ] `sql.emit.pivot_basic(params)`: generate basic pivot SQL
 - [ ] `sql.emit.unpivot_basic(params)`: generate basic unpivot SQL

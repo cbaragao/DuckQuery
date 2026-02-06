@@ -121,3 +121,24 @@ def aggregate_fn(name: str, arg: str) -> str:
 
     # Quote the argument for all other cases
     return f'{name_upper}("{arg}")'
+
+
+def order_by_clause(orderings: list[tuple[str, str]]) -> str:
+    """Emit a SQL ORDER BY fragment for a list of column/direction pairs.
+
+    - Each ordering is a tuple of (column_name, direction)
+    - Direction should be 'ASC' or 'DESC' (case-insensitive)
+    - If `orderings` is empty, returns an empty string
+    - Column names are double-quoted for safety
+    """
+    if not orderings:
+        return ""
+
+    parts = []
+    for col, direction in orderings:
+        direction_upper = direction.upper()
+        if direction_upper not in ("ASC", "DESC"):
+            raise ValueError(f"Invalid sort direction: {direction}")
+        parts.append(f'"{col}" {direction_upper}')
+
+    return f"ORDER BY {', '.join(parts)}"
