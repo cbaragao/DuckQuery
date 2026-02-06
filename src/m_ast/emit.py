@@ -161,3 +161,40 @@ def limit_offset(limit: int | None, offset: int | None) -> str:
         parts.append(f"OFFSET {offset}")
 
     return " ".join(parts)
+
+
+def pivot_basic(
+    table_name: str,
+    pivot_column: str,
+    value_column: str,
+    agg: str,
+    values: list[str] | None = None,
+) -> str:
+    """Generate basic pivot SQL using CASE expressions.
+
+    - table_name: source table
+    - pivot_column: column whose distinct values become new columns
+    - value_column: column providing the values to aggregate
+    - agg: aggregate function (e.g., 'SUM', 'COUNT')
+    - values: optional list of pivot values; if None, must be provided externally
+
+    Returns a SQL query string that pivots the data.
+    """
+    if not values:
+        raise ValueError("pivot_basic requires a non-empty 'values' list")
+
+    agg_upper = agg.upper()
+
+    # Build CASE expressions for each pivot value
+    case_exprs = []
+    for val in values:
+        # Quote the column name that will be created from the value
+        col_name = f"{val}"
+        case_expr = (
+            f"{agg_upper}(CASE WHEN \"{pivot_column}\" = '{val}' "
+            f'THEN "{value_column}" END) AS "{col_name}"'
+        )
+        case_exprs.append(case_expr)
+
+    select_list = ", ".join(case_exprs)
+    return f'SELECT {select_list} FROM "{table_name}"'
