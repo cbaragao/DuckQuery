@@ -77,3 +77,5 @@ Additional lessons (2026-02-04 updates)
 - Lessons: avoid breaking inline code or fenced tokens across lines; run `markdownlint` early; add `.markdownlintignore` to skip virtualenv/vendor files; prefer spaces over hard tabs in markdown; preserve indentation when auto-editing checklists.
 - Implemented `m_ast.nodes.Buffer` AST node with focused unit tests. Buffer forces table materialization, preventing further query folding (matches M's `Table.Buffer` semantics). Full test suite: 83 passed.
 - Implemented `ast.explain_step(step)` to return human-readable descriptions of AST transformation steps. Added 9 focused unit tests covering all node types. Full test suite: 92 passed.
+- Fixed pre-commit config warnings: removed deprecated `env:` key from mypy hook (replaced with `additional_dependencies: []`) and removed deprecated `stages: [commit]` from markdownlint hook.
+- Verified `sql.emit.from_clause(table_name)` implementation (already existed with 2 focused unit tests). Function emits FROM clause with quoted table names. Full test suite: 92 passed.
