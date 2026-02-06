@@ -15,8 +15,7 @@ repos:
       - id: mypy
         pass_filenames: false
         args: ["--namespace-packages", "-p", "m_ast"]
-        env:
-          MYPYPATH: src
+        additional_dependencies: []
 
   - repo: local
     hooks:
@@ -25,4 +24,3 @@ repos:
         entry: npx markdownlint-cli2
         language: system
         files: "\\.md$"
-        stages: [commit]
