@@ -25,7 +25,7 @@ Atomized checklist (implement one function/method + one unit test per item)
 - [x] `sql.emit.from_clause(table_name)`: emit FROM fragment
 - [x] `sql.emit.where_clause(conditions)`: emit WHERE fragment for simple conditions
 - [x] `sql.emit.join_clause(join)`: emit SQL for a single JOIN
-- [ ] `sql.emit.group_by_clause(columns)`: emit GROUP BY fragment
+- [x] `sql.emit.group_by_clause(columns)`: emit GROUP BY fragment
 - [ ] `sql.emit.aggregate_fn(name, arg)`: map SUM/COUNT/AVG to SQL
 - [ ] `sql.emit.order_by_clause(orderings)`: emit ORDER BY fragment
 - [ ] `sql.emit.limit_offset(limit, offset)`: emit LIMIT/OFFSET fragments (handle 0)

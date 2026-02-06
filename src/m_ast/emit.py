@@ -88,3 +88,15 @@ def join_clause(join: Join) -> str:
     join_type = kind_map.get(join.kind, "INNER JOIN")
 
     return f'{join_type} "{right_table}" ON {on_clause}'
+
+
+def group_by_clause(columns: list[str]) -> str:
+    """Emit a SQL GROUP BY fragment for a list of column names.
+
+    - If `columns` is empty, returns an empty string.
+    - Column names are double-quoted for safety.
+    """
+    if not columns:
+        return ""
+    cols = ", ".join([f'"{c}"' for c in columns])
+    return f"GROUP BY {cols}"

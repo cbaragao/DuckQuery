@@ -81,3 +81,4 @@ Additional lessons (2026-02-04 updates)
 - Verified `sql.emit.from_clause(table_name)` implementation (already existed with 2 focused unit tests). Function emits FROM clause with quoted table names. Full test suite: 92 passed.
 - Implemented `sql.emit.where_clause(conditions)` to emit WHERE fragment for simple conditions. Added 3 focused unit tests (single condition, multiple conditions AND-joined, empty list). Full test suite: 95 passed.
 - Implemented `sql.emit.join_clause(join)` to emit SQL JOIN clauses for Join AST nodes. Supports inner/left/right/full joins with multiple ON conditions. Added 4 focused unit tests. Full test suite: 99 passed.
+- Implemented `sql.emit.group_by_clause(columns)` to emit GROUP BY fragment. Added 3 focused unit tests (single column, multiple columns, empty list). Full test suite: 102 passed.
