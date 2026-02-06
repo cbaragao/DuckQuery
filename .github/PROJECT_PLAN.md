@@ -56,7 +56,7 @@ Atomized checklist (implement one function/method + one unit test per item)
 - [x] `README.md`: pre-commit install instructions added
 - [x] `mypy`: tightened config and typing fixes applied (e.g., `src/main.py`)
 - [ ] `docs.cookbook_select_where_join.md`: one-page examples mapping M-like ops to SQL
-- [ ] `lint.markdown`: add markdown linter (e.g., `remark-lint` / `markdownlint`) and fix repo warnings
+- [x] `lint.markdown`: add markdown linter (e.g., `remark-lint` / `markdownlint`) and fix repo warnings
 
 How to work from this plan
 
