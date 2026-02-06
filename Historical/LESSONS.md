@@ -84,3 +84,4 @@ Additional lessons (2026-02-04 updates)
 - Implemented `sql.emit.group_by_clause(columns)` to emit GROUP BY fragment. Added 3 focused unit tests (single column, multiple columns, empty list). Full test suite: 102 passed.
 - Implemented `sql.emit.aggregate_fn(name, arg)` to map aggregate functions (SUM/COUNT/AVG/MIN/MAX) to SQL. Handles COUNT(*) special case and validates function names. Added 8 focused unit tests. Full test suite: 110 passed.
 - Implemented `sql.emit.order_by_clause(orderings)` to emit ORDER BY fragment for column/direction pairs. Validates direction (ASC/DESC) and is case-insensitive. Added 6 focused unit tests. Full test suite: 116 passed.
+- Implemented `sql.emit.limit_offset(limit, offset)` to emit LIMIT/OFFSET fragments. Handles None, zero, and negative values correctly. Added 8 focused unit tests. Full test suite: 124 passed.

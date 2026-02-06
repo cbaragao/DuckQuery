@@ -142,3 +142,22 @@ def order_by_clause(orderings: list[tuple[str, str]]) -> str:
         parts.append(f'"{col}" {direction_upper}')
 
     return f"ORDER BY {', '.join(parts)}"
+
+
+def limit_offset(limit: int | None, offset: int | None) -> str:
+    """Emit LIMIT and/or OFFSET SQL fragments.
+
+    - Both limit and offset are optional (can be None)
+    - If limit is 0 or negative, it's treated as "no limit"
+    - If offset is 0 or negative, it's treated as "no offset"
+    - Returns empty string if both are None or non-positive
+    """
+    parts = []
+
+    if limit is not None and limit > 0:
+        parts.append(f"LIMIT {limit}")
+
+    if offset is not None and offset > 0:
+        parts.append(f"OFFSET {offset}")
+
+    return " ".join(parts)
