@@ -100,3 +100,24 @@ def group_by_clause(columns: list[str]) -> str:
         return ""
     cols = ", ".join([f'"{c}"' for c in columns])
     return f"GROUP BY {cols}"
+
+
+def aggregate_fn(name: str, arg: str) -> str:
+    """Map common aggregate function names to SQL syntax.
+
+    - Supports: SUM, COUNT, AVG, MIN, MAX
+    - The argument is quoted if it's not '*'
+    - Returns the SQL aggregate expression
+    """
+    name_upper = name.upper()
+    valid_aggs = {"SUM", "COUNT", "AVG", "MIN", "MAX"}
+
+    if name_upper not in valid_aggs:
+        raise ValueError(f"Unsupported aggregate function: {name}")
+
+    # COUNT(*) is a special case - don't quote the asterisk
+    if name_upper == "COUNT" and arg == "*":
+        return "COUNT(*)"
+
+    # Quote the argument for all other cases
+    return f'{name_upper}("{arg}")'
