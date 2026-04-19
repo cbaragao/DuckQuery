@@ -163,6 +163,22 @@ is_reserved("selector") # False  (partial match, not reserved)
 The set covers the most common ANSI SQL and DuckDB reserved words (`SELECT`, `FROM`,
 `WHERE`, `JOIN`, `GROUP`, `ORDER`, `LIMIT`, `OFFSET`, `NULL`, `TRUE`, `FALSE`, …).
 
+## Column Normalization Utilities (m_ast.cols)
+
+### normalize_suffixes(columns)
+
+Strip numeric suffixes (`_1`, `_2`, …) from column names when safe.
+
+A strip is safe when the candidate base name does not already appear in the list and no two columns would strip to the same base name. This is useful for cleaning up DuckDB/pandas auto-renamed duplicate columns.
+
+```python
+from m_ast.cols import normalize_suffixes
+
+normalize_suffixes(["name_1", "value_2"])  # ["name", "value"]
+normalize_suffixes(["id", "id_1"])         # ["id", "id_1"]  — "id" already exists
+normalize_suffixes(["x_1", "x_2"])         # ["x_1", "x_2"] — both strip to "x"
+```
+
 ## Development Status
 
 See [PROJECT_PLAN.md](../.github/PROJECT_PLAN.md) for the atomized task checklist and implementation status.
