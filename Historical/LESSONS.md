@@ -9,6 +9,11 @@ This file captures short lessons learned during the daily refactoring sessions.
 - Jinja2 whitespace control is subtle; use explicit trimming (`{%-` / `-%}`) only where it preserves intended newlines.
 - For extreme-value outlier detection, prefer a simple heuristic (IQR by default, switch to std-dev when extreme max present) — make configurable later.
 
+2026-04-19
+
+- `ident.is_reserved(name)` uses a `frozenset` of lowercase reserved words for O(1) lookups; `.lower()` on the input makes the check case-insensitive without normalising the stored set.
+- An empty string passed to `is_reserved` returns `False` (safe default) unlike `quote` which raises `ValueError`.
+
 Next actions:
 
 - Consider exposing column-normalization as an explicit option when preserving original names is required.

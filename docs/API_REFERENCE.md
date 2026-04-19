@@ -139,6 +139,30 @@ order_by_clause([("name", "ASC"), ("age", "DESC")])
 # Returns: 'ORDER BY "name" ASC, "age" DESC'
 ```
 
+## Identifier Utilities (m_ast.ident)
+
+### quote(name)
+
+Safely quote an identifier for SQL output (see above).
+
+### is_reserved(name)
+
+Return `True` if *name* is a common SQL / DuckDB reserved word (case-insensitive).
+
+Use this to decide whether an identifier needs quoting before embedding it in SQL.
+
+```python
+from m_ast.ident import is_reserved
+
+is_reserved("select")   # True
+is_reserved("SELECT")   # True
+is_reserved("my_col")   # False
+is_reserved("selector") # False  (partial match, not reserved)
+```
+
+The set covers the most common ANSI SQL and DuckDB reserved words (`SELECT`, `FROM`,
+`WHERE`, `JOIN`, `GROUP`, `ORDER`, `LIMIT`, `OFFSET`, `NULL`, `TRUE`, `FALSE`, …).
+
 ## Development Status
 
 See [PROJECT_PLAN.md](../.github/PROJECT_PLAN.md) for the atomized task checklist and implementation status.
