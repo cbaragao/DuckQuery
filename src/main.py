@@ -1,3 +1,4 @@
+import re
 import pandas as pd
 import duckdb
 import traceback
@@ -6,6 +7,7 @@ from typing import Dict, Optional
 from jinja2 import Environment, PackageLoader, select_autoescape
 from m_ast.nodes import SelectColumns
 from m_ast.emit import emit_selectcolumns
+from m_ast.config import get_normalize_columns
 
 env = Environment(loader=PackageLoader("main"), autoescape=select_autoescape())
 
@@ -273,25 +275,15 @@ class List:
         template = env.get_template("sql.txt")
         query = template.render(**params)
         self.df = self.db.execute(query).df()
-        # DuckDB / pandas may rename duplicate columns to `name_1` etc.
-        # Normalize such renamed columns back to their base name when appropriate
-        # so tests that expect duplicated column names will pass.
-        cols = list(self.df.columns)
-        normalized = []
-        import re
-
-        for c in cols:
-            m = re.match(r"^(.*)_(\d+)$", str(c))
-            if m:
-                base = m.group(1)
-                if base in normalized:
-                    new_name = base
+        if get_normalize_columns():
+            raw = list(self.df.columns)
+            normalized: list[str] = []
+            for c in raw:
+                m = re.match(r"^(.+)_(\d+)$", str(c))
+                if m and m.group(1) in normalized:
+                    normalized.append(m.group(1))
                 else:
-                    new_name = c
-            else:
-                new_name = c
-            normalized.append(new_name)
-        # Assign the possibly-normalized columns back to the dataframe
-        self.df.columns = normalized
+                    normalized.append(str(c))
+            self.df.columns = normalized
         self.register()
         return self

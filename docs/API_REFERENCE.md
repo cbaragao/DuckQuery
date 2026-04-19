@@ -163,6 +163,22 @@ is_reserved("selector") # False  (partial match, not reserved)
 The set covers the most common ANSI SQL and DuckDB reserved words (`SELECT`, `FROM`,
 `WHERE`, `JOIN`, `GROUP`, `ORDER`, `LIMIT`, `OFFSET`, `NULL`, `TRUE`, `FALSE`, …).
 
+## Configuration (m_ast.config)
+
+### set_normalize_columns(enabled)
+
+Toggle automatic normalization of DuckDB/pandas numeric column-name suffixes in `run_query`.
+
+When enabled (default `True`), columns like `id_1` produced by a join are renamed back to `id` so downstream code sees the original names. Set to `False` to preserve raw DuckDB output.
+
+```python
+from m_ast.config import set_normalize_columns, get_normalize_columns
+
+set_normalize_columns(False)  # preserve raw DuckDB column names
+set_normalize_columns(True)   # restore default (strip _1, _2 … on duplicates)
+get_normalize_columns()       # -> bool
+```
+
 ## Column Normalization Utilities (m_ast.cols)
 
 ### normalize_suffixes(columns)

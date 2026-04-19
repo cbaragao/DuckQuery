@@ -14,6 +14,7 @@ This file captures short lessons learned during the daily refactoring sessions.
 - `ident.is_reserved(name)` uses a `frozenset` of lowercase reserved words for O(1) lookups; `.lower()` on the input makes the check case-insensitive without normalising the stored set.
 - An empty string passed to `is_reserved` returns `False` (safe default) unlike `quote` which raises `ValueError`.
 
+- `config.set_normalize_columns` gates a module-level boolean; `run_query` checks it via `get_normalize_columns()` before applying the duplicate-restoring suffix logic. `normalize_suffixes` (safe stripping) and the `run_query` normalization (restore DuckDB-renamed duplicates) have intentionally different semantics — the former avoids collisions, the latter intentionally recreates duplicate column names so downstream code sees original names.
 - `cols.normalize_suffixes` uses a two-pass approach: first count how many columns share the same base name, then only strip when the count is exactly 1 and the base doesn't already exist. Importing `Counter` inside the function avoids a module-level import for a tiny helper.
 
 Next actions:
